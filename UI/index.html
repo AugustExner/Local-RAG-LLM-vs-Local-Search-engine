@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoke Function</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      label {
+        font-weight: bold;
+      }
+      input {
+        margin-right: 10px;
+        padding: 5px;
+        font-size: 16px;
+      }
+      button {
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      #response {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #007b00;
+        font-weight: bold;
+      }
+      #error {
+        color: #b00000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ask Your Question</h1>
+    <form id="invoke-form">
+      <label for="question">Enter your question:</label>
+      <input type="text" id="question" name="question" required />
+      <button type="submit">Submit</button>
+    </form>
+    <p id="response"></p>
+
+    <script>
+      document
+        .getElementById("invoke-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const question = document.getElementById("question").value;
+          console.log("Question submitted: ", question);
+          const responseElement = document.getElementById("response");
+
+          // Clear previous response or error
+          responseElement.textContent = "Processing your request...";
+
+          try {
+            const res = await fetch("http://127.0.0.1:5000/invoke", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ question }),
+            });
+
+            const data = await res.json();
+            if (data.response) {
+              console.log(data.response);
+              responseElement.innerHTML = `<span id="success">Response: ${data.response}</span>`;
+            } else {
+              responseElement.innerHTML = `<span id="error">Error: ${data.error}</span>`;
+            }
+          } catch (error) {
+            responseElement.innerHTML = `<span id="error">Request failed: ${error.message}</span>`;
+          }
+        });
+    </script>
+  </body>
+</html>
